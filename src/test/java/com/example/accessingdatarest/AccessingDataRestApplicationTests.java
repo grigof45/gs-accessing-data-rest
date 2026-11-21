@@ -7,15 +7,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import com.example.accessingdatarest.repository.PersonRepository;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static java.util.Objects.requireNonNull;
+import org.springframework.beans.factory.annotation.Value;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AccessingDataRestApplicationTests {
+
+  
+  @Value("${spring.data.rest.base-path}")  
+  private String baseUrl;  
 
   @Autowired
   private MockMvc mockMvc;
@@ -31,14 +39,14 @@ public class AccessingDataRestApplicationTests {
   @Test
   public void shouldReturnRepositoryIndex() throws Exception {
 
-    mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk()).andExpect(
+    mockMvc.perform(get(baseUrl+"/")).andDo(print()).andExpect(status().isOk()).andExpect(
         jsonPath("$._links.people").exists());
   }
 
   @Test
   public void shouldCreateEntity() throws Exception {
 
-    mockMvc.perform(post("/people").content(
+    mockMvc.perform(post(baseUrl+"/people").content(
         "{\"firstName\": \"Frodo\", \"lastName\":\"Baggins\"}")).andExpect(
             status().isCreated()).andExpect(
                 header().string("Location", containsString("people/")));
@@ -47,7 +55,7 @@ public class AccessingDataRestApplicationTests {
   @Test
   public void shouldRetrieveEntity() throws Exception {
 
-    MvcResult mvcResult = mockMvc.perform(post("/people").content(
+    MvcResult mvcResult = mockMvc.perform(post(baseUrl+"/people").content(
         "{\"firstName\": \"Frodo\", \"lastName\":\"Baggins\"}")).andExpect(
             status().isCreated()).andReturn();
 
@@ -60,12 +68,12 @@ public class AccessingDataRestApplicationTests {
   @Test
   public void shouldQueryEntity() throws Exception {
 
-    mockMvc.perform(post("/people").content(
+    mockMvc.perform(post(baseUrl+"/people").content(
         "{ \"firstName\": \"Frodo\", \"lastName\":\"Baggins\"}")).andExpect(
             status().isCreated());
 
     mockMvc.perform(
-        get("/people/search/findByLastName?name={name}", "Baggins")).andExpect(
+        get(baseUrl+"/people/search/findByLastName?name={name}", "Baggins")).andExpect(
             status().isOk()).andExpect(
                 jsonPath("$._embedded.people[0].firstName").value(
                     "Frodo"));
@@ -74,7 +82,7 @@ public class AccessingDataRestApplicationTests {
   @Test
   public void shouldUpdateEntity() throws Exception {
 
-    MvcResult mvcResult = mockMvc.perform(post("/people").content(
+    MvcResult mvcResult = mockMvc.perform(post(baseUrl+"/people").content(
         "{\"firstName\": \"Frodo\", \"lastName\":\"Baggins\"}")).andExpect(
             status().isCreated()).andReturn();
 
@@ -92,7 +100,7 @@ public class AccessingDataRestApplicationTests {
   @Test
   public void shouldPartiallyUpdateEntity() throws Exception {
 
-    MvcResult mvcResult = mockMvc.perform(post("/people").content(
+    MvcResult mvcResult = mockMvc.perform(post(baseUrl+"/people").content(
         "{\"firstName\": \"Frodo\", \"lastName\":\"Baggins\"}")).andExpect(
             status().isCreated()).andReturn();
 
@@ -110,7 +118,7 @@ public class AccessingDataRestApplicationTests {
   @Test
   public void shouldDeleteEntity() throws Exception {
 
-    MvcResult mvcResult = mockMvc.perform(post("/people").content(
+    MvcResult mvcResult = mockMvc.perform(post(baseUrl+"/people").content(
         "{ \"firstName\": \"Bilbo\", \"lastName\":\"Baggins\"}")).andExpect(
             status().isCreated()).andReturn();
 
