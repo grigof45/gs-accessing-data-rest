@@ -9,7 +9,41 @@
 This guide walks you through the process of creating an application that accesses
 relational JPA data through a link:/guides/gs/rest-hateoas[hypermedia-based]
 link:/understanding/REST[RESTful] front end.
+== Работа с приложением
+curl -i -H "Content-Type:application/json" -d "{\"firstName\": \"Frodo\", \"lastName\": \"Baggins\"}" http://localhost:8080/people
+curl -X PATCH -H "Content-Type:application/json" -d "{\"firstName\": \"Bilbo Jr.\"}" http://localhost:8080/people/1
+curl -X DELETE http://localhost:8080/people/1
+== Работа с докером
+docker build -t demo9restful:latest .
+docker run -dit -p 80:8080  --name demo9restful demo9restful:latest 
+== Настройки базы H2 в памяти
+Файл application.properties
+spring.datasource.url=jdbc:h2:mem:jpaDB
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=adnane
+spring.datasource.password=
 
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.show-sql=true
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+spring.devtools.restart.enabled=true
+== Настройки базы H2 в файле
+Файл application.properties
+spring.datasource.url=spring.datasource.url=jdbc:h2:file:./mydatabase;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=adnane
+spring.datasource.password=
+
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.show-sql=false
+spring.h2.console.enabled=false
+spring.h2.console.path=/h2-console
+
+spring.devtools.restart.enabled=true
 == What You Will Build
 
 You will build a Spring application that lets you create and retrieve `Person` objects
